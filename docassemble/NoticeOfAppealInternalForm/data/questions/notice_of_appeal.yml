@@ -1,5 +1,3 @@
-# Signature, Username (form writter), Attorny names, Yes or No questions. These are all not working in various ways. 
-
 ---
 include:
   - docassemble.AssemblyLine:al_package.yml
@@ -34,14 +32,18 @@ data:
     
   allowed courts: 
     - "Appeals Court"
+    - "Appellate Tax Board"
     - "Boston Municipal Court"
+    - "Dept. of Industrial Accidents"
+    - "Dept. of Employment and Training"
     - "District Court"
+    - "District Court Appellate Division"
+    - "Employment Relations Board"
     - "Housing Court"
     - "Juvenile Court"
     - "Land Court"
     - "Probate and Family Court"
     - "Superior Court"
-    - "Supreme Judicial Court"
   categories:
     - "Internal Appeals Forms"
   typical role: "na"
@@ -113,7 +115,6 @@ code: |
   basic_questions_signature_flow    
   notice_of_appeal_download
 ---
-# Might be nice to break up this area of text more. Tried another sub question but didnt add a break. 
 comment: |
   This question is used to introduce your interview. Please customize
 id: Notice_of_the_Assembly_of_the_Record_on_Appeal_Appellate_Court_Entry_Statement
@@ -121,22 +122,24 @@ continue button field: notice_of_appeal_intro
 question: |
   Notice of the Assembly of the Record on Appeal Appellate Court Entry Statement
 subquestion: |
-  This interview will guide you through filling the **"Notice of the Assembly of the Record on Appeal Appellate Court Entry Statement" (Notice of Appeal).** It is a form that is part of a total package that will be sent via email to (assembly@appct.state.ma.us) upon the completion of this guided interview. This is an internal procedure that is intended to group up and deliver all pertinent documents and information for a matter that is going through the appeals process.
+  This interview will guide you through filling the **"Notice of the Assembly of the Record on Appeal Appellate Court Entry Statement" (Notice of Appeal).** It is a form that is part of a total package that will be sent to the chosen court upon the completion of this guided interview. 
+  
+  This is an internal procedure that is intended to group up and deliver all pertinent documents and information for a matter that is going through the appeals process.
 ---
-# I think adding this up front and then after this selection a list of documents w/ hyperlinks on where or how to get them would be good. It varries depending on the matter on appeal so force a specific check might be useful for the just in time trianing idea. 
-# id: selection_of_matter_on_appeal
-# question: |
- # Please select the case type or judgment type on review.
-# fields:
-  # input type: dropdown
-  # choices: 
-  #  -  Civil Case, Full Bench Appeal from a Judgment, Mass. R. A. P. 4(a)
-  #  -  Criminal Case, Mass. R. A. P. 4(b)
-  #  -  Summary Process Case, Full Bench Appeal from a Judgment, G. L. c. 239, § 5
-  #  -  Summary Process Case, Single Justice Appeal Regarding Appeal Bond, G. L. c. 239, § 5
-  #  -  Finding Concerning Indigency, Single Justice Appeal, G. L. c. 261, § 27D
-  #  -  Attorney’s Fees for Frivolous Case, Single Justice Appeal, G. L. c. 231, § 6G
-  #  -  Procedural Amount Dismissals, Single Justice Appeal, G. L. c. 212, § 3A and G. L. c. 218, § 19A 
+## I think adding this up front and then after this selection a list of documents w/ hyperlinks on where or how to get them would be good. It varries depending on the matter on appeal so force a specific check might be useful for the just in time trianing idea. 
+#id: selection_of_matter_on_appeal
+#question: |
+# Please select the case type or judgment type on review.
+#field: type_of_appeal
+#  input type: dropdown
+#  choices: 
+#   -  Civil Case, Full Bench Appeal from a Judgment, Mass. R. A. P. 4(a)
+#   -  Criminal Case, Mass. R. A. P. 4(b)
+#   -  Summary Process Case, Full Bench Appeal from a Judgment, G. L. c. 239, § 5
+#   -  Summary Process Case, Single Justice Appeal Regarding Appeal Bond, G. L. c. 239, § 5
+#   -  Finding Concerning Indigency, Single Justice Appeal, G. L. c. 261, § 27D
+#   -  Attorney’s Fees for Frivolous Case, Single Justice Appeal, G. L. c. 231, § 6G
+#   -  Procedural Amount Dismissals, Single Justice Appeal, G. L. c. 212, § 3A and G. L. c. 218, § 19A 
 ---
 id: USELESS
 question: |
@@ -151,7 +154,6 @@ fields:
   - "useless": statement_district_court
     maxlength: 23
 ---
-# The drop down to select the 'nature of the case' field should drop down into an editable entry. We could also ditch the drop down and do a simple text field. I think the editable drop down would help a new user of the form. 
 id: Trial Court Information
 question: |
   Trial Court Information
@@ -163,7 +165,7 @@ fields:
   - "Case Name": case_name
     maxlength: 168
   - "Nature of the case": case_nature
-    input type: dropdown
+    input type: combobox
     choices:
       - Abuse Prevention Order
       - Administrative Law
@@ -212,17 +214,23 @@ fields:
   - "Date Petition, Complaint or Indictment Entered into Trial Court": petitions_date
     datatype: date
 ---
-# Whole page needs a lot of work. 
+# Might be smart to shift the 'case' term into the Case Name variable we already take. 
 id: Impounded Information
 question: |
-  Impounded Information
+  Is the Case or any information impounded?
 subquestion: |
-  Is any relevant information impounded?
+  If yes, attach a copy of the order of impoundment or provide the citation to the statute or rule pursuant to which the documents were impounded, and specify each impounded document. See S.J.C. Rule 1:15, § 2(a).
 fields:
   - "Is there impounded information?": impounded_info
-    datatype: yesno
+    input type: combobox
+    choices:
+      - Yes
+      - No
+      - Partially Impounded
   - "Description of impounded information": impounded_info_desc
     maxlength: 90
+help: |
+  If there is no impounded information type N/A into description field.
 ---
 id: Appeals Court Information
 question: |
@@ -238,9 +246,7 @@ fields:
     datatype: date
   - "Number of transcript volumes": transcripts_numbers
     datatype: number
-  - "Yes": yes
-    datatype: yesno
-  - "No": no_1
+  - "Are you attaching CDs with PDFs of the Transcript": yes
     datatype: yesno
   - "Date of transcribed proceedings": transcription_date
     datatype: date
