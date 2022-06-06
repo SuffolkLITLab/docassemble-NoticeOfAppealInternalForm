@@ -1,0 +1,500 @@
+# Signature, Username (form writter), Attorny names, Yes or No questions. These are all not working in various ways. 
+
+---
+include:
+  - docassemble.AssemblyLine:al_package.yml
+  - docassemble.ALMassachusetts:al_massachusetts.yml
+  - docassemble.MassAccess:massaccess.yml
+---
+metadata:
+  title: |
+    Notice of the Assembly of the Record on Appeal Appellate Court Entry Statement
+  short title: |
+    Notice of Assembly
+  tags:
+    - Other
+  authors:
+    - Hayden McGuire
+    - Ivette Cuenod
+---
+mandatory: True
+comment: |
+  Global interview metadata
+variable name: interview_metadata["notice_of_appeal"]
+data:
+  al_weaver_version: "1.6.3"
+  generated on: "2022-06-02"
+  title: >-
+    Notice of the Assembly of the Record on Appeal Appellate Court Entry Statement
+  short title: >-
+    Notice of Assembly
+  description: |-
+    This is an internal document for the courts for judgments on appeal.
+  original_form: >-
+    
+  allowed courts: 
+    - "Appeals Court"
+    - "Boston Municipal Court"
+    - "District Court"
+    - "Housing Court"
+    - "Juvenile Court"
+    - "Land Court"
+    - "Probate and Family Court"
+    - "Superior Court"
+    - "Supreme Judicial Court"
+  categories:
+    - "Internal Appeals Forms"
+  typical role: "na"
+  generate download screen: True
+---
+code: |
+  interview_metadata['main_interview_key'] =  'notice_of_appeal'
+---
+code: |
+  # This controls the default country and list of states in address field questions
+  AL_DEFAULT_COUNTRY = "US"
+---
+code: |
+  # This controls the default state in address field questions
+  AL_DEFAULT_STATE = "MA"
+---
+code: |
+  github_repo_name =  'docassemble-NoticeOfAppeal'
+---
+code: |
+  interview_short_title = "Stating appeal of judgment"
+---
+code: |
+  al_form_type = "appeal" 
+---
+objects:
+  - users: ALPeopleList.using(ask_number=True,target_number=1)
+---
+sections:
+  - review_notice_of_appeal: Review your answers
+---
+#################### Interview order #####################
+comment: |
+  Controls order and branching logic for questions specific to this form
+id: interview_order_notice_of_appeal
+code: |
+  # Set the allowed courts for this interview
+  allowed_courts = interview_metadata["notice_of_appeal"]["allowed courts"]
+  nav.set_section('review_notice_of_appeal')
+  user_role = 'na'
+  form_entry_statement_flag
+  trial_docket_number
+  impounded_info
+  set_progress(20)
+  appeal_file_date
+  trial_court.department
+  attorneys.gather()
+  set_progress(40)
+  users.gather()
+  set_parts(subtitle=str(users))
+  signature_date
+  set_progress(60)
+  form_entry_statement_case
+  interview_order_notice_of_appeal = True
+---
+###################### Main order ######################
+comment: |
+  This block includes the logic for standalone interviews.
+  Delete mandatory: True to include in another interview
+mandatory: True
+code: |
+  al_intro_screen
+  notice_of_appeal_intro
+  interview_order_notice_of_appeal
+  signature_date    
+  # Save anonymized interview statistics (customize the saved data below)
+  store_variables_snapshot(data={'zip': users[0].address.zip})    
+  notice_of_appeal_preview_question
+  basic_questions_signature_flow    
+  notice_of_appeal_download
+---
+# Might be nice to break up this area of text more. Tried another sub question but didnt add a break. 
+comment: |
+  This question is used to introduce your interview. Please customize
+id: Notice_of_the_Assembly_of_the_Record_on_Appeal_Appellate_Court_Entry_Statement
+continue button field: notice_of_appeal_intro
+question: |
+  Notice of the Assembly of the Record on Appeal Appellate Court Entry Statement
+subquestion: |
+  This interview will guide you through filling the **"Notice of the Assembly of the Record on Appeal Appellate Court Entry Statement" (Notice of Appeal).** It is a form that is part of a total package that will be sent via email to (assembly@appct.state.ma.us) upon the completion of this guided interview. This is an internal procedure that is intended to group up and deliver all pertinent documents and information for a matter that is going through the appeals process.
+---
+# I think adding this up front and then after this selection a list of documents w/ hyperlinks on where or how to get them would be good. It varries depending on the matter on appeal so force a specific check might be useful for the just in time trianing idea. 
+# id: selection_of_matter_on_appeal
+# question: |
+ # Please select the case type or judgment type on review.
+# fields:
+  # input type: dropdown
+  # choices: 
+  #  -  Civil Case, Full Bench Appeal from a Judgment, Mass. R. A. P. 4(a)
+  #  -  Criminal Case, Mass. R. A. P. 4(b)
+  #  -  Summary Process Case, Full Bench Appeal from a Judgment, G. L. c. 239, § 5
+  #  -  Summary Process Case, Single Justice Appeal Regarding Appeal Bond, G. L. c. 239, § 5
+  #  -  Finding Concerning Indigency, Single Justice Appeal, G. L. c. 261, § 27D
+  #  -  Attorney’s Fees for Frivolous Case, Single Justice Appeal, G. L. c. 231, § 6G
+  #  -  Procedural Amount Dismissals, Single Justice Appeal, G. L. c. 212, § 3A and G. L. c. 218, § 19A 
+---
+id: USELESS
+question: |
+  USELESS
+fields:
+  - "Useless": form_entry_statement_flag
+    maxlength: 186
+  - "Useless": form_statement_court_county
+    maxlength: 28
+  - "useless": form_statement_court
+    maxlength: 23
+  - "useless": statement_district_court
+    maxlength: 23
+---
+# The drop down to select the 'nature of the case' field should drop down into an editable entry. We could also ditch the drop down and do a simple text field. I think the editable drop down would help a new user of the form. 
+id: Trial Court Information
+question: |
+  Trial Court Information
+subquestion: |
+  Please provide all the requested information about the Trial Court proceedings.
+fields:
+  - "Trial Court docket numbers": trial_docket_number
+    maxlength: 148
+  - "Case Name": case_name
+    maxlength: 168
+  - "Nature of the case": case_nature
+    input type: dropdown
+    choices:
+      - Abuse Prevention Order
+      - Administrative Law
+      - Appellate Tax Board
+      - Arbitration
+      - Business/Commercial
+      - Child Welfare/DCF/Adoption
+      - Civil Forfeiture
+      - Civil Motor Vehicle Infractions
+      - Civil Service
+      - Contract
+      - Domestic Relations/Family Law
+      - Employment Law/Discrimination
+      - Environmental, G. L. c. 21E
+      - Equity
+      - Government/Municipality
+      - Impoundment
+      - Insurance Law
+      - Labor Law/Employment Relations Board
+      - Land Use
+      - Legal or Non-Medical Malpractice
+      - Medical Malpractice
+      - Mortgage/Foreclosure Law
+      - Prisoners Rights and Claims
+      - Probate law
+      - Real Estate
+      - Sex Offender Registry Board
+      - Sexually Dangerous Person Proceeding
+      - Tort
+      - Workers Compensation
+      - Crime Against Property
+      - Juvenile Delinquency/Youthful Offender
+      - Manslaughter
+      - Motor Vehicle Offense
+      - Murder, 2nd Degree
+      - Possession - Drugs
+      - Possession - Guns
+      - Possession - Pornography
+      - Possession - Other, please specify ____
+      - Probation/Restitution
+      - Public Order Offense
+      - Reported Question
+      - Sealing/Expungement
+      - Sexual Offense
+      - Other, please specify ___
+  - "Date Petition, Complaint or Indictment Entered into Trial Court": petitions_date
+    datatype: date
+---
+# Whole page needs a lot of work. 
+id: Impounded Information
+question: |
+  Impounded Information
+subquestion: |
+  Is any relevant information impounded?
+fields:
+  - "Is there impounded information?": impounded_info
+    datatype: yesno
+  - "Description of impounded information": impounded_info_desc
+    maxlength: 90
+---
+id: Appeals Court Information
+question: |
+  Appeals Court Information
+subquestion: |
+  Please provide any requested information about the Court of Appeals proceedings.
+fields:
+  - "Date when appeal was filed": appeal_file_date
+    datatype: date
+  - "Order or judgment on appeal": judgment_on_appeal
+    maxlength: 186
+  - "Date transcripts ordered": transcripts_date
+    datatype: date
+  - "Number of transcript volumes": transcripts_numbers
+    datatype: number
+  - "Yes": yes
+    datatype: yesno
+  - "No": no_1
+    datatype: yesno
+  - "Date of transcribed proceedings": transcription_date
+    datatype: date
+  - "For Criminal Cases, has a Stay of Execution of Sentence been granted": no_2
+    datatype: yesno
+  - "Date entered in S.J.C or Appeals Court": appeal_entry_date
+    datatype: date
+  - "SJC or Appeals Court Docket Number": docket2_number
+    maxlength: 42
+  - "Signature": form_entry_statement_case
+    input type: area
+    maxlength: 13
+---
+id: preview notice_of_appeal
+question: |
+  Preview your form before you sign it
+subquestion: |
+  Here is a preview of the form you will sign on the next page.   
+  
+  ${ al_court_bundle.as_pdf(key='preview') }
+
+  Click the image to open it in a new tab. Click the "Edit answers" button
+  to edit your answers.
+
+  ${ action_button_html(url_action('review_notice_of_appeal'), label='Edit answers', color='info') }
+  
+  Remember to come back to this window to continue and sign your form.
+continue button field: notice_of_appeal_preview_question    
+---
+code: |
+  signature_fields = ['form_entry_statement_case']
+---
+code: |
+  # This is a placeholder for the addresses that will be searched
+  # for matching address to court. Edit if court venue is based on 
+  # a different address than the user's
+  addresses_to_search = [user.address for user in users]
+---
+id: notice of appeal review screen
+event: review_notice_of_appeal
+question: |
+  Review your answers
+review:
+  - Edit: form_entry_statement_flag
+    button: |
+      **Useless**:
+      ${ form_entry_statement_flag }
+  - Edit: form_statement_court_county
+    button: |
+      **Useless**:
+      ${ form_statement_court_county }
+  - Edit: form_statement_court
+    button: |
+      **useless**:
+      ${ form_statement_court }
+  - Edit: statement_district_court
+    button: |
+      **useless**:
+      ${ statement_district_court }
+  - Edit: trial_docket_number
+    button: |
+      **Trial Court docket numbers**:
+      ${ trial_docket_number }
+  - Edit: case_name
+    button: |
+      **Case Name**:
+      ${ case_name }
+  - Edit: case_nature
+    button: |
+      **Nature of the case**:
+      ${ case_nature }
+  - Edit: petitions_date
+    button: |
+      **Date Petition, Complaint or Indictment Entered into Trial Court**:
+      ${ petitions_date }
+  - Edit: impounded_info
+    button: |
+      **Is there impounded information?**:
+      ${ word(yesno(impounded_info)) }
+  - Edit: impounded_info_desc
+    button: |
+      **Description of impounded information**:
+      ${ impounded_info_desc }
+  - Edit: appeal_file_date
+    button: |
+      **Date when appeal was filed**:
+      ${ appeal_file_date }
+  - Edit: judgment_on_appeal
+    button: |
+      **Order or judgment on appeal**:
+      ${ judgment_on_appeal }
+  - Edit: transcripts_date
+    button: |
+      **Date transcripts ordered**:
+      ${ transcripts_date }
+  - Edit: transcripts_numbers
+    button: |
+      **Number of transcript volumes**:
+      ${ transcripts_numbers }
+  - Edit: yes
+    button: |
+      **Yes**:
+      ${ word(yesno(yes)) }
+  - Edit: no_1
+    button: |
+      **No**:
+      ${ word(yesno(no_1)) }
+  - Edit: transcription_date
+    button: |
+      **Date of transcribed proceedings**:
+      ${ transcription_date }
+  - Edit: no_2
+    button: |
+      **For Criminal Cases, has a Stay of Execution of Sentence been granted**:
+      ${ word(yesno(no_2)) }
+  - Edit: appeal_entry_date
+    button: |
+      **Date entered in S.J.C or Appeals Court**:
+      ${ appeal_entry_date }
+  - Edit: docket2_number
+    button: |
+      **SJC or Appeals Court Docket Number**:
+      ${ docket2_number }
+  - Edit: form_entry_statement_case
+    button: |
+      **Signature**:
+      > ${ single_paragraph(form_entry_statement_case) }
+  - Edit: trial_court
+    button: |
+      **trial_court**
+
+      % if defined("trial_court.department"):
+      * department: ${ trial_court.department }
+      % endif
+  - Edit: attorneys.revisit
+    button: |
+      **Attorneys**
+
+      % for item in attorneys:
+        * ${ item }
+      % endfor
+  - Edit: users.revisit
+    button: |
+      **Users**
+
+      % for item in users:
+        * ${ item }
+      % endfor
+  - Edit: signature_date
+    button: |
+      **signature_date**:
+      ${ signature_date }
+---
+continue button field: attorneys.revisit
+question: |
+  Edit attorneys
+subquestion: |
+  ${ attorneys.table }
+
+  ${ attorneys.add_action() }
+---
+table: attorneys.table
+rows: attorneys
+columns:
+  - Name: |
+      row_item.name.full() if defined("row_item.name.first") else ""
+edit:
+  - name.first
+confirm: True
+
+---
+continue button field: users.revisit
+question: |
+  Edit users
+subquestion: |
+  ${ users.table }
+
+  ${ users.add_action() }
+---
+table: users.table
+rows: users
+columns:
+  - Name: |
+      row_item.name.full() if defined("row_item.name.first") else ""
+edit:
+  - name.first
+confirm: True
+
+---
+id: download notice_of_appeal
+event: notice_of_appeal_download
+question: |
+  All done
+subquestion: |
+  Thank you ${users}. Your form is ready to download and deliver.
+  
+  View, download and send your form below. Click the "Edit answers" button to fix any mistakes.
+
+  ${ action_button_html(url_action('review_notice_of_appeal'), label='Edit answers', color='info') }
+  
+  
+  ${ al_user_bundle.download_list_html() }
+  
+
+  ${ al_user_bundle.send_button_html(show_editable_checkbox=False) }
+
+progress: 100
+---
+objects:
+  - notice_of_appeal_post_interview_instructions: ALDocument.using(title="Instructions", filename="notice_of_appeal_next_steps.docx", enabled=True, has_addendum=False, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE)
+  - notice_of_appeal_attachment: ALDocument.using(title="Notice of the Assembly of the Record on Appeal Appellate Court Entry Statement", filename="notice_of_appeal.pdf", enabled=True, has_addendum=False, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE)
+---
+objects:
+  - al_user_bundle: ALDocumentBundle.using(elements=[notice_of_appeal_post_interview_instructions,notice_of_appeal_attachment], filename="notice_of_appeal.pdf_package.pdf", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[notice_of_appeal_attachment], filename="notice_of_appeal.pdf_package.pdf", title="All forms to download for your records", enabled=True)
+---
+attachments:
+  - name: notice of appeal post interview instructions
+    filename: Post-interview-instructions     
+    variable name: notice_of_appeal_post_interview_instructions[i]        
+    skip undefined: True
+    docx template file: notice_of_appeal_next_steps.docx
+  - name: notice of appeal attachment
+    filename: notice_of_appeal.pdf     
+    variable name: notice_of_appeal_attachment[i]        
+    skip undefined: True
+    pdf template file: notice_of_appeal.pdf
+    fields:
+      - "trial_court_department": ${ trial_court.department }
+      - "attorneys1_name": ${ attorneys[0] }
+      - "attorneys2_name": ${ attorneys[1] }
+      - "users1_name": ${ users[0] }
+      - "signature_date": ${ signature_date }
+      - "form_entry_statement_flag": ${ form_entry_statement_flag }
+      - "form_statement_court_county": ${ form_statement_court_county }
+      - "form_statement_court__2": ${ form_statement_court }
+      - "statement_district_court": ${ statement_district_court }
+      - "trial_docket_number": ${ trial_docket_number }
+      - "case_name": ${ case_name }
+      - "case_nature": ${ case_nature }
+      - "petitions_date": ${ petitions_date }
+      - "impounded_info": ${ impounded_info }
+      - "impounded_info_desc": ${ impounded_info_desc }
+      - "appeal_file_date": ${ appeal_file_date }
+      - "judgment_on_appeal": ${ judgment_on_appeal }
+      - "transcripts_date": ${ transcripts_date }
+      - "transcripts_numbers": ${ "{:,.2f}".format(transcripts_numbers) }
+      - "yes__1": ${ yes }
+      - "yes__2": ${ yes }
+      - "no_1": ${ no_1 }
+      - "transcription_date": ${ transcription_date }
+      - "no_2": ${ no_2 }
+      - "appeal_entry_date": ${ appeal_entry_date }
+      - "docket2_number": ${ docket2_number }
+      - "form_entry_statement_case__7": ${ form_entry_statement_case }
+      # It's a signature: test which file version this is; leave empty unless it's the final version)
+      - "form_entry_statement_case__6": ${ form_entry_statement_case if i == 'final' else '' }
