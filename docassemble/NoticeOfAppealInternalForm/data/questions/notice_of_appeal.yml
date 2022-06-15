@@ -1,3 +1,4 @@
+# Trying to get interview to not ask for 2/3 variables (extrainious fields on pdf)- lines 252-258 (#'d out rn)
 ---
 include:
   - docassemble.AssemblyLine:al_package.yml
@@ -13,7 +14,6 @@ metadata:
     - Other
   authors:
     - Hayden McGuire
-    - Ivette Cuenod
 ---
 mandatory: True
 comment: |
@@ -81,10 +81,11 @@ comment: |
 id: interview_order_notice_of_appeal
 code: |
   # Set the allowed courts for this interview
+  
   allowed_courts = interview_metadata["notice_of_appeal"]["allowed courts"]
   nav.set_section('review_notice_of_appeal')
   user_role = 'na'
-  form_entry_statement_flag
+  #form_entry_statement_flag
   trial_docket_number
   impounded_info
   set_progress(20)
@@ -96,17 +97,33 @@ code: |
   set_parts(subtitle=str(users))
   signature_date
   set_progress(60)
-  form_entry_statement_case
+  #form_entry_statement_case
   interview_order_notice_of_appeal = True
 ---
 ###################### Main order ######################
+mandatory: true
 comment: |
   This block includes the logic for standalone interviews.
   Delete mandatory: True to include in another interview
-mandatory: True
 code: |
   al_intro_screen
   notice_of_appeal_intro
+  type_of_appeal
+  if type_of_appeal == 'Civil Case, Full Bench Appeal from a Judgment, Mass. R. A. P. 4(a)':
+    civil_case
+  if type_of_appeal == 'Criminal Case, Mass. R. A. P. 4(b)':
+    criminal_case
+  if type_of_appeal == 'Summary Process Case, Full Bench Appeal from a Judgment, G. L. c. 239, § 5':
+    full_bench_summary_process
+  if type_of_appeal == 'Summary Process Case, Single Justice Appeal Regarding Appeal Bond, G. L. c. 239, § 5':
+    single_justice_summary_process
+  if type_of_appeal == 'Finding Concerning Indigency, Single Justice Appeal, G. L. c. 261, § 27D':
+    finding_concerning_indigency
+  if type_of_appeal == 'Attorney’s Fees for Frivolous Case, Single Justice Appeal, G. L. c. 231, § 6G':
+    fee_frivolous_case
+  if type_of_appeal == 'Procedural Amount Dismissals, Single Justice Appeal, G. L. c. 212, § 3A and G. L. c. 218, § 19A':
+    procedural_amount_dismissals
+  exhibit_attachment.exhibits.gather()
   interview_order_notice_of_appeal
   signature_date    
   # Save anonymized interview statistics (customize the saved data below)
@@ -120,39 +137,24 @@ comment: |
 id: Notice_of_the_Assembly_of_the_Record_on_Appeal_Appellate_Court_Entry_Statement
 continue button field: notice_of_appeal_intro
 question: |
-  Notice of the Assembly of the Record on Appeal Appellate Court Entry Statement
+  Form: **Notice of the Assembly of the Record on Appeal Appellate Court Entry Statement**
 subquestion: |
   This interview will guide you through filling the **"Notice of the Assembly of the Record on Appeal Appellate Court Entry Statement" (Notice of Appeal).** It is a form that is part of a total package that will be sent to the chosen court upon the completion of this guided interview. 
   
   This is an internal procedure that is intended to group up and deliver all pertinent documents and information for a matter that is going through the appeals process.
 ---
-## I think adding this up front and then after this selection a list of documents w/ hyperlinks on where or how to get them would be good. It varries depending on the matter on appeal so force a specific check might be useful for the just in time trianing idea. 
-#id: selection_of_matter_on_appeal
+#id: USELESS
 #question: |
-# Please select the case type or judgment type on review.
-#field: type_of_appeal
-#  input type: dropdown
-#  choices: 
-#   -  Civil Case, Full Bench Appeal from a Judgment, Mass. R. A. P. 4(a)
-#   -  Criminal Case, Mass. R. A. P. 4(b)
-#   -  Summary Process Case, Full Bench Appeal from a Judgment, G. L. c. 239, § 5
-#   -  Summary Process Case, Single Justice Appeal Regarding Appeal Bond, G. L. c. 239, § 5
-#   -  Finding Concerning Indigency, Single Justice Appeal, G. L. c. 261, § 27D
-#   -  Attorney’s Fees for Frivolous Case, Single Justice Appeal, G. L. c. 231, § 6G
-#   -  Procedural Amount Dismissals, Single Justice Appeal, G. L. c. 212, § 3A and G. L. c. 218, § 19A 
----
-id: USELESS
-question: |
-  USELESS
-fields:
-  - "Useless": form_entry_statement_flag
-    maxlength: 186
-  - "Useless": form_statement_court_county
-    maxlength: 28
-  - "useless": form_statement_court
-    maxlength: 23
-  - "useless": statement_district_court
-    maxlength: 23
+#  USELESS
+#fields:
+#  - "Useless": form_entry_statement_flag
+#    maxlength: 186
+#  - "Useless": form_statement_court_county
+#    maxlength: 28
+#  - "useless": form_statement_court
+#    maxlength: 23
+#  - "useless": statement_district_court
+#    maxlength: 23
 ---
 id: Trial Court Information
 question: |
@@ -214,12 +216,11 @@ fields:
   - "Date Petition, Complaint or Indictment Entered into Trial Court": petitions_date
     datatype: date
 ---
-# Might be smart to shift the 'case' term into the Case Name variable we already take. 
 id: Impounded Information
 question: |
-  Is the Case or any information impounded?
+  Is ${case_name} or any information impounded?
 subquestion: |
-  If yes, attach a copy of the order of impoundment or provide the citation to the statute or rule pursuant to which the documents were impounded, and specify each impounded document. See S.J.C. Rule 1:15, § 2(a).
+  If yes, attach a copy of the order of impoundment or provide the citation to the statute or rule pursuant to which the documents were impounded, and specify each impounded document. **See S.J.C. Rule 1:15, § 2(a)**.
 fields:
   - "Is there impounded information?": impounded_info
     input type: combobox
@@ -229,10 +230,10 @@ fields:
       - Partially Impounded
   - "Description of impounded information": impounded_info_desc
     maxlength: 90
-help: |
-  If there is no impounded information type N/A into description field.
+    help: |
+      If there is no impounded information type N/A into description field.
 ---
-id: Appeals Court Information
+id: appeals court information
 question: |
   Appeals Court Information
 subquestion: |
@@ -240,8 +241,12 @@ subquestion: |
 fields:
   - "Date when appeal was filed": appeal_file_date
     datatype: date
+    help: |
+      Please select the date when the appeal was initially filled for. 
   - "Order or judgment on appeal": judgment_on_appeal
     maxlength: 186
+    help: |
+      Please input the XYZ?
   - "Date transcripts ordered": transcripts_date
     datatype: date
   - "Number of transcript volumes": transcripts_numbers
@@ -252,13 +257,13 @@ fields:
     datatype: date
   - "For Criminal Cases, has a Stay of Execution of Sentence been granted": no_2
     datatype: yesno
-  - "Date entered in S.J.C or Appeals Court": appeal_entry_date
-    datatype: date
-  - "SJC or Appeals Court Docket Number": docket2_number
-    maxlength: 42
-  - "Signature": form_entry_statement_case
-    input type: area
-    maxlength: 13
+  #- "Date entered in S.J.C or Appeals Court": appeal_entry_date
+  #  datatype: date
+  #- "SJC or Appeals Court Docket Number": docket2_number
+  #  maxlength: 42
+  #- "Signature": form_entry_statement_case
+  #  input type: area
+  #  maxlength: 13
 ---
 id: preview notice_of_appeal
 question: |
@@ -276,8 +281,8 @@ subquestion: |
   Remember to come back to this window to continue and sign your form.
 continue button field: notice_of_appeal_preview_question    
 ---
-code: |
-  signature_fields = ['form_entry_statement_case']
+#code: |
+#  signature_fields = ['form_entry_statement_case']
 ---
 code: |
   # This is a placeholder for the addresses that will be searched
@@ -285,27 +290,195 @@ code: |
   # a different address than the user's
   addresses_to_search = [user.address for user in users]
 ---
+# got it to run (FINALLY) - i think itd be better if it asks for document names. could just pull the type_of_appeal and then show the required/optional attachments. 
+generic object: ALExhibitList
+id: any exhibits
+question: |
+  % if al_form_type in ['starts_case','existing_case','appeal']:
+  Please attach the required documents for your appeal type.
+  % else:
+  Do you have any documents that you want to attach to this form?
+  % endif
+fields:
+  - Do you have any documents you want to upload?: x.has_exhibits
+    datatype: yesnoradio
+  - note: |
+      **Okay**. You will have a chance to upload multiple documents. 
+      You can also add additional pages to this document.
+    show if: x.has_exhibits
+  - First document title: x[0].title
+    maxlength: 60 # longer might break TOC
+    show if: x.has_exhibits    
+  - Upload the first document: x[0].pages
+    show if: x.has_exhibits    
+    datatype: files
+    maximum image size: 1024
+    image upload type: jpeg        
+    accept: |
+      "image/png, image/jpeg, .doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/pdf,.pdf"   
+validation code: |
+  if x.has_exhibits:
+    if sum(exhibit.size_in_bytes() for exhibit in x[0].pages) > (15 * 1024 * 1024):
+      validation_error("Upload a file smaller than 15 MB.")
+    try:
+      pdf_concatenate(x[0].pages)
+    except:
+      validation_error("Unable to convert this file. Please upload a new one.", field="x[0].pages")
+    x[0].pages.reset_gathered()  # docassemble sets this attribute but we want to force gathering additional pages
+---
+id: selection_of_matter_on_appeal
+question: |
+ Please select the case type or judgment type on review. 
+subquestion:  |
+  After selection you will be informed of all required documents to attach, please ensure you have them all ready before proceeding with the interveiw.
+
+  If you need help answering this question please click "Help" in the upper-left of the interview screen.
+field: type_of_appeal
+help: |
+   You are being asked to select the kind of case that is being appealed. Civil, Criminal, Housing, Probate and Family, etc.
+dropdown:
+   -  Civil Case, Full Bench Appeal from a Judgment, Mass. R. A. P. 4(a)
+   -  Criminal Case, Mass. R. A. P. 4(b)
+   -  Summary Process Case, Full Bench Appeal from a Judgment, G. L. c. 239, § 5
+   -  Summary Process Case, Single Justice Appeal Regarding Appeal Bond, G. L. c. 239, § 5
+   -  Finding Concerning Indigency, Single Justice Appeal, G. L. c. 261, § 27D
+   -  Attorney’s Fees for Frivolous Case, Single Justice Appeal, G. L. c. 231, § 6G
+   -  Procedural Amount Dismissals, Single Justice Appeal, G. L. c. 212, § 3A and G. L. c. 218, § 19A   
+---
+event: civil_case
+question: |
+  You selected, Civil Case, Full Bench Appeal from a Judgment, Mass. R. A. P. 4(a), please see the required attachments for a succesful Notice of Appeal filling. 
+subquestion: |  
+  In addition to completing this Notice of Assembley form, you will need to attach:
+  
+  * Completed **Appellate Court Entry Statement** including notification of any impounded material;
+  * Copy of the notice of assembly issued to the parties;
+  * Copy of the notice(s) of appeal;
+  * Copy of any order of impoundment;
+  * Copy of docket entries; and
+  * A list of the exhibits, if any **(do not send the exhibits themselves unless specifically requested by the Appelas Court)**
+  * If it is a care and protection case, a copy of the judge's findings and rulings. 
+
+  **If you have the listed documents please click continue.**
+continue button field: civil_case
+---
+event: criminal_case
+question: |
+  You selected, **Criminal Case, Mass. R. A. P. 4(b)**, please see the required attachments for a succesful Notice of Appeal filling. 
+subquestion: |  
+  In addition to completing this Notice of Assembley form, you will need to attach:
+  
+  * Completed **Appellate Court Entry Statement** including notification of any impounded material;
+  * Copy of the notice of assembly issued to the parties;
+  * Copy of the notice(s) of appeal;
+  * Copy of any order of impoundment;
+  * Copy of docket entries;
+  * A list of the exhibits, if any **(do not send the exhibits themselves unless specifically requested by the Appelas Court)**
+  * An electronically formatted transcript, if necessary for the appeal.
+continue button field: criminal_case
+---
+event: full_bench_summary_process
+question: |
+  You selected, **Summary Process Case, Full Bench Appeal from a Judgment, G. L. c. 239, § 5**, please see the required attachments for a succesful Notice of Appeal filling. 
+subquestion: |
+  In addition to completing this Notice of Assembley form, you will need to attach:
+  
+  * Completed **Appellate Court Entry Statement** including notification of any impounded material;
+  * Copy of the notice of assembly issued to the parties;
+  * Copy of the notice(s) of appeal;
+  * Copy of any order of impoundment;
+  * Copy of docket entries;
+  * A list of the exhibits, if any **(do not send the exhibits themselves unless specifically requested by the Appelas Court)**
+continue button field: full_bench_summary_process
+---
+event: single_justice_summary_process
+question: |
+  You selected, **Summary Process Case, Single Justice Appeal Regarding Appeal Bond, G. L. c. 239, § 5**, please see the required attachments for a succesful Notice of Appeal filling. 
+subquestion: |
+  In addition to completing this Notice of Assembley form, you will need to attach:
+
+  * Completed **Appellate Court Entry Statement** including notification of any impounded material;
+  * Copy of the notice of assembly issued to the parties;
+  * Copy of the docket entries;
+  * Copy of any order of impoundment;
+  * Copy of the original judgment and summary process findings;
+  * Copy of the notice of appeal from the original judgment;
+  * Copy of the motion to waive appeal bond (and opposition, if any);
+  * Copy of the affidavit of indigency;
+  * Copy of the judge's order concerning the bond;
+  * Copy of the request for review of orders/notice of appeal; and
+  * Copy of any other document deemed relevant to the bond appeal.
+continue button field: single_justice_summary_process
+---
+event: finding_concerning_indigency
+question: |
+  You selected, **Finding Concerning Indigency, Single Justice Appeal, G. L. c. 261, § 27D**, please see the required attachments for a succesful Notice of Appeal filling. 
+subquestion: |
+  In addition to completing this Notice of Assembley form, you will need to attach:
+  
+  * Completed **Appellate Court Entry Statement** including notification of any impounded material;
+  * Copy of the notice of assembly issued to the parties;
+  * Copy of the notice of appeal under G. L. c. 261, § 27D;
+  * Copy of the docket entries (if the fees in question relate to the entry of a new case, no docket sheets are involved);
+  * Applicable copy of the affidavit of indigency filed with the Trial Court;
+  * Applicable copy of any motion or other request for waiver, substitution or payment by the commonwealth of fees and costs;
+  * Applicable copy of a clerk’s referral to a judge; and
+  * A copy of judge’s finding concerning G. L. c. 261, § 27D determination.
+continue button field: finding_concerning_indigency
+---
+event: fee_frivolous_case
+question: |
+  You selected, **Attorney’s Fees for Frivolous Case, Single Justice Appeal, G. L. c. 231, § 6G**, please see the required attachments for a succesful Notice of Appeal filling. 
+subquestion: |
+  In addition to completing this Notice of Assembley form, you will need to attach:
+  
+  * Completed **Appellate Court Entry Statement** including notification of any impounded material;
+  * Copy of the notice of assembly issued to the parties;
+  * Copy of the notice of appeal under G. L. c. 231, § 6G;
+  * Copy of the docket entries;
+  * Copy of the original judgment (and any findings and rulings) in the case, if judgment has entered;
+  * Copy of the motion for attorney’s fees (and opposition, if any);
+  * Copy of the judge’s findings and order concerning the motion for fees; and
+  * Copy of any other document deemed relevant to the attorney’s fees appeal.
+continue button field: fee_frivolous_case
+---
+event: procedural_amount_dismissals
+question: |
+  You selected, **Procedural Amount Dismissals, Single Justice Appeal**, please see the required attachments for a succesful Notice of Appeal filling. 
+subquestion: |
+  In addition to completing this Notice of Assembley form, you will need to attach:
+
+  * Completed **Appellate Court Entry Statement** including notification of any impounded material;
+  * Copy of the notice of assembly issued to the parties;
+  * Copy of the notice of appeal under G. L. c. 212, § 3A or G. L. c. 218, § 19A;
+  * Copy of the docket entries;
+  * Copy of the complaint;
+  * Copy of any statement of the parties specifying the plaintiff’s potential damages;
+  * Copy of the judge’s findings and rulings justifying the dismissal;
+  * Copy of any other document deemed relevant to the procedural amount dismissal appeal.
+continue button field: procedural_amount_dismissals
+---
 id: notice of appeal review screen
 event: review_notice_of_appeal
 question: |
   Review your answers
 review:
-  - Edit: form_entry_statement_flag
-    button: |
-      **Useless**:
-      ${ form_entry_statement_flag }
-  - Edit: form_statement_court_county
-    button: |
-      **Useless**:
-      ${ form_statement_court_county }
-  - Edit: form_statement_court
-    button: |
-      **useless**:
-      ${ form_statement_court }
-  - Edit: statement_district_court
-    button: |
-      **useless**:
-      ${ statement_district_court }
+#  - Edit: form_entry_statement_flag
+#    button: |
+#      **Useless**:
+#      ${ form_entry_statement_flag }
+#  - Edit: form_statement_court_county
+#    button: |
+#      **Useless**:
+#      ${ form_statement_court_county }
+#  - Edit: form_statement_court
+#    button: |
+#      **useless**:
+#      ${ form_statement_court }
+#  - Edit: statement_district_court
+#    button: |
+#      **useless**:
+#      ${ statement_district_court }
   - Edit: trial_docket_number
     button: |
       **Trial Court docket numbers**:
@@ -370,10 +543,10 @@ review:
     button: |
       **SJC or Appeals Court Docket Number**:
       ${ docket2_number }
-  - Edit: form_entry_statement_case
-    button: |
-      **Signature**:
-      > ${ single_paragraph(form_entry_statement_case) }
+#  - Edit: form_entry_statement_case
+#    button: |
+#      **Signature**:
+#      > ${ single_paragraph(form_entry_statement_case) }
   - Edit: trial_court
     button: |
       **trial_court**
@@ -458,6 +631,13 @@ progress: 100
 objects:
   - notice_of_appeal_post_interview_instructions: ALDocument.using(title="Instructions", filename="notice_of_appeal_next_steps.docx", enabled=True, has_addendum=False, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE)
   - notice_of_appeal_attachment: ALDocument.using(title="Notice of the Assembly of the Record on Appeal Appellate Court Entry Statement", filename="notice_of_appeal.pdf", enabled=True, has_addendum=False, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE)
+  - exhibit_attachment: ALExhibitDocument.using(
+         title="Exhibits",
+         filename="exhibits",
+         add_page_numbers=True,
+         include_table_of_contents=True,
+         include_exhibit_cover_pages=True,
+       )
 ---
 objects:
   - al_user_bundle: ALDocumentBundle.using(elements=[notice_of_appeal_post_interview_instructions,notice_of_appeal_attachment], filename="notice_of_appeal.pdf_package.pdf", title="All forms to download for your records", enabled=True)
@@ -480,10 +660,10 @@ attachments:
       - "attorneys2_name": ${ attorneys[1] }
       - "users1_name": ${ users[0] }
       - "signature_date": ${ signature_date }
-      - "form_entry_statement_flag": ${ form_entry_statement_flag }
-      - "form_statement_court_county": ${ form_statement_court_county }
-      - "form_statement_court__2": ${ form_statement_court }
-      - "statement_district_court": ${ statement_district_court }
+#      - "form_entry_statement_flag": ${ form_entry_statement_flag }
+#      - "form_statement_court_county": ${ form_statement_court_county }
+#      - "form_statement_court__2": ${ form_statement_court }
+#      - "statement_district_court": ${ statement_district_court }
       - "trial_docket_number": ${ trial_docket_number }
       - "case_name": ${ case_name }
       - "case_nature": ${ case_nature }
