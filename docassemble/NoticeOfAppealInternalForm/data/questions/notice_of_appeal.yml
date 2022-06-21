@@ -1,4 +1,7 @@
-# Trying to get interview to not ask for 2/3 variables (extrainious fields on pdf)- lines 252-258 (#'d out rn)
+#Some of the ordering is set up to be better for testing show if logic. 
+#There is still the error where it does not succesfully put the Clerks name into the field. Looking to gather email also?
+#It also has two question pages that I did not want to add. It collects "your name" and "your address" the address collection makes the court selection field try to locate a court house near you. 
+# #'d out block starting at 476. This is info that the court recieving the appeal fills out. New docket and intake date.  
 ---
 include:
   - docassemble.AssemblyLine:al_package.yml
@@ -11,7 +14,17 @@ metadata:
   short title: |
     Notice of Assembly
   tags:
-    - Other
+    - BE-00-00-00-00
+    - BE-04-00-00-00
+    - ED-00-00-00-00
+    - ES-00-00-00-00
+    - FA-00-00-00-00
+    - FA-07-00-00-00
+    - HE-00-00-00-00
+    - HO-00-00-00-00
+    - IM-00-00-00-00
+    - MO-00-00-00-00
+    - RI-10-00-00-00
   authors:
     - Hayden McGuire
 ---
@@ -21,7 +34,7 @@ comment: |
 variable name: interview_metadata["notice_of_appeal"]
 data:
   al_weaver_version: "1.6.3"
-  generated on: "2022-06-02"
+  generated on: "2022-06-21"
   title: >-
     Notice of the Assembly of the Record on Appeal Appellate Court Entry Statement
   short title: >-
@@ -31,22 +44,26 @@ data:
   original_form: >-
     
   allowed courts: 
-    - "Appeals Court"
-    - "Appellate Tax Board"
     - "Boston Municipal Court"
-    - "Dept. of Industrial Accidents"
-    - "Dept. of Employment and Training"
     - "District Court"
-    - "District Court Appellate Division"
-    - "Employment Relations Board"
     - "Housing Court"
     - "Juvenile Court"
     - "Land Court"
     - "Probate and Family Court"
     - "Superior Court"
   categories:
-    - "Internal Appeals Forms"
-  typical role: "na"
+    - "BE-00-00-00-00"
+    - "HE-00-00-00-00"
+    - "HO-00-00-00-00"
+    - "IM-00-00-00-00"
+    - "MO-00-00-00-00"
+    - "FA-00-00-00-00"
+    - "BE-04-00-00-00"
+    - "ES-00-00-00-00"
+    - "RI-10-00-00-00"
+    - "FA-07-00-00-00"
+    - "ED-00-00-00-00"
+  typical role: "unknown"
   generate download screen: True
 ---
 code: |
@@ -64,7 +81,7 @@ code: |
   github_repo_name =  'docassemble-NoticeOfAppeal'
 ---
 code: |
-  interview_short_title = "Stating appeal of judgment"
+  interview_short_title = "Informing higher court of record on appeal"
 ---
 code: |
   al_form_type = "appeal" 
@@ -81,30 +98,30 @@ comment: |
 id: interview_order_notice_of_appeal
 code: |
   # Set the allowed courts for this interview
-  
   allowed_courts = interview_metadata["notice_of_appeal"]["allowed courts"]
   nav.set_section('review_notice_of_appeal')
-  user_role = 'na'
-  #form_entry_statement_flag
-  trial_docket_number
-  impounded_info
-  set_progress(20)
-  appeal_file_date
+  # Below sets the user_role by asking a question.
+  # You can set user_role directly instead to either 'plaintiff' or 'defendant'
+  #user_ask_role
+  case_name
+  docket_numbers.gather()
   trial_court.department
-  attorneys.gather()
+  set_progress(20)
+  plaintiffs_attorneys
+  any_impounded_info
+  ordered_transcripts_date
   set_progress(40)
-  users.gather()
-  set_parts(subtitle=str(users))
-  signature_date
+  notice_of_appeal_date
+  clerk_name
   set_progress(60)
-  #form_entry_statement_case
+  appeals_entry_date
   interview_order_notice_of_appeal = True
 ---
 ###################### Main order ######################
-mandatory: true
 comment: |
   This block includes the logic for standalone interviews.
   Delete mandatory: True to include in another interview
+mandatory: True
 code: |
   al_intro_screen
   notice_of_appeal_intro
@@ -123,6 +140,9 @@ code: |
     fee_frivolous_case
   if type_of_appeal == 'Procedural Amount Dismissals, Single Justice Appeal, G. L. c. 212, § 3A and G. L. c. 218, § 19A':
     procedural_amount_dismissals
+  if type_of_appeal == 'Criminal Case, Mass. R. A. P. 4(b)':
+    yes_stay_of_execution
+    #The above if statement will be changed this is better for demo to show variable flow if thats how this is displayed in meeting. End point is after impounded info gather.
   if exhibit_attachment.exhibits.has_exhibits:
    exhibit_attachment.exhibits.gather()
   interview_order_notice_of_appeal
@@ -138,201 +158,17 @@ comment: |
 id: Notice_of_the_Assembly_of_the_Record_on_Appeal_Appellate_Court_Entry_Statement
 continue button field: notice_of_appeal_intro
 question: |
-  Form: **Notice of the Assembly of the Record on Appeal Appellate Court Entry Statement**
+  **Notice of the Assembly of the Record on Appeal Appellate Court Entry Statement**
 subquestion: |
   This interview will guide you through filling the **"Notice of the Assembly of the Record on Appeal Appellate Court Entry Statement" (Notice of Appeal).** It is a form that is part of a total package that will be sent to the chosen court upon the completion of this guided interview. 
   
   This is an internal procedure that is intended to group up and deliver all pertinent documents and information for a matter that is going through the appeals process.
----
-#id: USELESS
-#question: |
-#  USELESS
-#fields:
-#  - "Useless": form_entry_statement_flag
-#    maxlength: 186
-#  - "Useless": form_statement_court_county
-#    maxlength: 28
-#  - "useless": form_statement_court
-#    maxlength: 23
-#  - "useless": statement_district_court
-#    maxlength: 23
----
-id: Trial Court Information
-question: |
-  Trial Court Information
-subquestion: |
-  Please provide all the requested information about the Trial Court proceedings.
-fields:
-  - "Trial Court docket numbers": trial_docket_number
-    maxlength: 148
-  - "Case Name": case_name
-    maxlength: 168
-  - "Nature of the case": case_nature
-    input type: combobox
-    choices:
-      - Abuse Prevention Order
-      - Administrative Law
-      - Appellate Tax Board
-      - Arbitration
-      - Business/Commercial
-      - Child Welfare/DCF/Adoption
-      - Civil Forfeiture
-      - Civil Motor Vehicle Infractions
-      - Civil Service
-      - Contract
-      - Domestic Relations/Family Law
-      - Employment Law/Discrimination
-      - Environmental, G. L. c. 21E
-      - Equity
-      - Government/Municipality
-      - Impoundment
-      - Insurance Law
-      - Labor Law/Employment Relations Board
-      - Land Use
-      - Legal or Non-Medical Malpractice
-      - Medical Malpractice
-      - Mortgage/Foreclosure Law
-      - Prisoners Rights and Claims
-      - Probate law
-      - Real Estate
-      - Sex Offender Registry Board
-      - Sexually Dangerous Person Proceeding
-      - Tort
-      - Workers Compensation
-      - Crime Against Property
-      - Juvenile Delinquency/Youthful Offender
-      - Manslaughter
-      - Motor Vehicle Offense
-      - Murder, 2nd Degree
-      - Possession - Drugs
-      - Possession - Guns
-      - Possession - Pornography
-      - Possession - Other, please specify ____
-      - Probation/Restitution
-      - Public Order Offense
-      - Reported Question
-      - Sealing/Expungement
-      - Sexual Offense
-      - Other, please specify ___
-  - "Date Petition, Complaint or Indictment Entered into Trial Court": petitions_date
-    datatype: date
----
-id: Impounded Information
-question: |
-  Is ${case_name} or any information impounded?
-subquestion: |
-  If yes, attach a copy of the order of impoundment or provide the citation to the statute or rule pursuant to which the documents were impounded, and specify each impounded document. **See S.J.C. Rule 1:15, § 2(a)**.
-fields:
-  - "Is there impounded information?": impounded_info
-    input type: combobox
-    choices:
-      - Yes
-      - No
-      - Partially Impounded
-  - "Description of impounded information": impounded_info_desc
-    maxlength: 90
-    help: |
-      If there is no impounded information type N/A into description field.
----
-id: appeals court information
-question: |
-  Appeals Court Information
-subquestion: |
-  Please provide any requested information about the Court of Appeals proceedings.
-fields:
-  - "Date when appeal was filed": appeal_file_date
-    datatype: date
-    help: |
-      Please select the date when the appeal was initially filled for. 
-  - "Order or judgment on appeal": judgment_on_appeal
-    maxlength: 186
-    help: |
-      Please input the XYZ?
-  - "Date transcripts ordered": transcripts_date
-    datatype: date
-  - "Number of transcript volumes": transcripts_numbers
-    datatype: number
-  - "Are you attaching CDs with PDFs of the Transcript": yes
-    datatype: yesno
-  - "Date of transcribed proceedings": transcription_date
-    datatype: date
-  - "For Criminal Cases, has a Stay of Execution of Sentence been granted": no_2
-    datatype: yesno
-  #- "Date entered in S.J.C or Appeals Court": appeal_entry_date
-  #  datatype: date
-  #- "SJC or Appeals Court Docket Number": docket2_number
-  #  maxlength: 42
-  #- "Signature": form_entry_statement_case
-  #  input type: area
-  #  maxlength: 13
----
-id: preview notice_of_appeal
-question: |
-  Preview your form before you sign it
-subquestion: |
-  Here is a preview of the form you will sign on the next page.   
-  
-  ${ al_court_bundle.as_pdf(key='preview') }
-
-  Click the image to open it in a new tab. Click the "Edit answers" button
-  to edit your answers.
-
-  ${ action_button_html(url_action('review_notice_of_appeal'), label='Edit answers', color='info') }
-  
-  Remember to come back to this window to continue and sign your form.
-continue button field: notice_of_appeal_preview_question    
----
-#code: |
-#  signature_fields = ['form_entry_statement_case']
----
-code: |
-  # This is a placeholder for the addresses that will be searched
-  # for matching address to court. Edit if court venue is based on 
-  # a different address than the user's
-  addresses_to_search = [user.address for user in users]
----
-# got it to run (FINALLY) - i think itd be better if it asks for document names. could just pull the type_of_appeal and then show the required/optional attachments. 
-generic object: ALExhibitList
-id: any exhibits
-question: |
-  % if al_form_type in ['starts_case','existing_case','appeal']:
-  Please attach the required documents for your appeal type.
-  % else:
-  Do you have any documents that you want to attach to this form?
-  % endif
-fields:
-  - Do you have any documents you want to upload?: x.has_exhibits
-    datatype: yesnoradio
-  - note: |
-      **Okay**. You will have a chance to upload multiple documents. 
-      You can also add additional pages to this document.
-    show if: x.has_exhibits
-  - First document title: x[0].title
-    maxlength: 60 # longer might break TOC
-    show if: x.has_exhibits    
-  - Upload the first document: x[0].pages
-    show if: x.has_exhibits    
-    datatype: files
-    maximum image size: 1024
-    image upload type: jpeg        
-    accept: |
-      "image/png, image/jpeg, .doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/pdf,.pdf"   
-validation code: |
-  if x.has_exhibits:
-    if sum(exhibit.size_in_bytes() for exhibit in x[0].pages) > (15 * 1024 * 1024):
-      validation_error("Upload a file smaller than 15 MB.")
-    try:
-      pdf_concatenate(x[0].pages)
-    except:
-      validation_error("Unable to convert this file. Please upload a new one.", field="x[0].pages")
-    x[0].pages.reset_gathered()  # docassemble sets this attribute but we want to force gathering additional pages
 ---
 id: selection_of_matter_on_appeal
 question: |
  Please select the case type or judgment type on review. 
 subquestion:  |
   After selection you will be informed of all required documents to attach, please ensure you have them all ready before proceeding with the interveiw.
-
   If you need help answering this question please click "Help" in the upper-left of the interview screen.
 field: type_of_appeal
 help: |
@@ -344,7 +180,7 @@ dropdown:
    -  Summary Process Case, Single Justice Appeal Regarding Appeal Bond, G. L. c. 239, § 5
    -  Finding Concerning Indigency, Single Justice Appeal, G. L. c. 261, § 27D
    -  Attorney’s Fees for Frivolous Case, Single Justice Appeal, G. L. c. 231, § 6G
-   -  Procedural Amount Dismissals, Single Justice Appeal, G. L. c. 212, § 3A and G. L. c. 218, § 19A   
+   -  Procedural Amount Dismissals, Single Justice Appeal, G. L. c. 212, § 3A and G. L. c. 218, § 19A 
 ---
 event: civil_case
 question: |
@@ -359,7 +195,6 @@ subquestion: |
   * Copy of docket entries; and
   * A list of the exhibits, if any **(do not send the exhibits themselves unless specifically requested by the Appelas Court)**
   * If it is a care and protection case, a copy of the judge's findings and rulings. 
-
   **If you have the listed documents please click continue.**
 continue button field: civil_case
 ---
@@ -397,7 +232,6 @@ question: |
   You selected, **Summary Process Case, Single Justice Appeal Regarding Appeal Bond, G. L. c. 239, § 5**, please see the required attachments for a succesful Notice of Appeal filling. 
 subquestion: |
   In addition to completing this Notice of Assembley form, you will need to attach:
-
   * Completed **Appellate Court Entry Statement** including notification of any impounded material;
   * Copy of the notice of assembly issued to the parties;
   * Copy of the docket entries;
@@ -448,7 +282,6 @@ question: |
   You selected, **Procedural Amount Dismissals, Single Justice Appeal**, please see the required attachments for a succesful Notice of Appeal filling. 
 subquestion: |
   In addition to completing this Notice of Assembley form, you will need to attach:
-
   * Completed **Appellate Court Entry Statement** including notification of any impounded material;
   * Copy of the notice of assembly issued to the parties;
   * Copy of the notice of appeal under G. L. c. 212, § 3A or G. L. c. 218, § 19A;
@@ -459,95 +292,315 @@ subquestion: |
   * Copy of any other document deemed relevant to the procedural amount dismissal appeal.
 continue button field: procedural_amount_dismissals
 ---
+# Area wheren gathering required attachments occurs. 
+# I think itd be better if it asks for document names. could just pull the type_of_appeal and then show the required/optional attachments. 
+generic object: ALExhibitList
+id: any exhibits
+question: |
+  % if al_form_type in ['starts_case','existing_case','appeal']:
+  Please attach the required documents for your appeal type.
+  % else:
+  Do you have any documents that you want to attach to this form?
+  % endif
+fields:
+  - Do you have any documents you want to upload?: x.has_exhibits
+    datatype: yesnoradio
+  - note: |
+      **Okay**. You will have a chance to upload multiple documents. 
+      You can also add additional pages to this document.
+    show if: x.has_exhibits
+  - First document title: x[0].title
+    maxlength: 60 # longer might break TOC
+    show if: x.has_exhibits    
+  - Upload the first document: x[0].pages
+    show if: x.has_exhibits    
+    datatype: files
+    maximum image size: 1024
+    image upload type: jpeg        
+    accept: |
+      "image/png, image/jpeg, .doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/pdf,.pdf"   
+validation code: |
+  if x.has_exhibits:
+    if sum(exhibit.size_in_bytes() for exhibit in x[0].pages) > (15 * 1024 * 1024):
+      validation_error("Upload a file smaller than 15 MB.")
+    try:
+      pdf_concatenate(x[0].pages)
+    except:
+      validation_error("Unable to convert this file. Please upload a new one.", field="x[0].pages")
+    x[0].pages.reset_gathered()  # docassemble sets this attribute but we want to force gathering additional pages
+---
+id: Trial Court Information
+question: |
+  Trial Court Information
+subquestion: |
+  Please provide all the requested information about the Trial Court proceedings. You will be asked for Attorney and Party information on the next screen.
+fields:
+  - "What is the name of the Case": case_name
+    maxlength: 84
+  - "What is the Nature of the case (Select most appropriate description)": nature_of_case
+    datatype: combobox
+    choices:
+      - Abuse Prevention Order
+      - Administrative Law
+      - Appellate Tax Board
+      - Arbitration
+      - Business/Commercial
+      - Child Welfare/DCF/Adoption
+      - Civil Forfeiture
+      - Civil Motor Vehicle Infractions
+      - Civil Service
+      - Contract
+      - Domestic Relations/Family Law
+      - Employment Law/Discrimination
+      - Environmental, G.L.c. 21E
+      - Equity
+      - Government/Municipality
+      - Impoundment
+      - Insurance Law
+      - Labor Law/Employment Relations Board
+      - Land Use
+      - Legal or Non-Medical Malpractice
+      - Medical Malpractice
+      - Mortgage/Foreclosure Law
+      - Prisoner  s Rights and Claims
+      - Probate Law
+      - Real Estate
+      - Sex Offender Registry Board
+      - Sexually Dangerous Person Proceeding
+      - Tort
+      - Workers Compensation
+      - Crime Against Property
+      - Juvenile Delinquency/Youthful Offender
+      - Manslaughter
+      - Motor Vehicle Offense
+      - Murder - 2nd Degree
+      - Possession - Drugs
+      - Possession - Guns
+      - Possession - Pornography
+      - Possession - Other please specify ____
+      - Probation/Restitution
+      - Public Order Offense
+      - Reported Question
+      - Sealing/Expungement
+      - Sexual Offense
+      - Other please specify ____
+      - Possession -
+  - "What is the date the petition, complaint or indictment was entered in Trial Court": trial_court_entry_date
+    datatype: date
+  - "The order or judgment being appealed": judgment_being_appealed
+    maxlength: 92
+---
+id: Persons and Party s involved in the case
+question: |
+  Persons and Party's involved in the case.
+subquestion: |
+  Please give attorney and party information.
+fields:
+  - "Who are the **Plaintiffs** Attorneys": plaintiffs_attorneys
+    maxlength: 45
+    help:
+      Provide Attorneys full name and BBO numbers.
+  - "Who are the **Defendants** Attorneys": defendants_attorneys
+    maxlength: 46
+    help:
+      Provide Attorneys full name and BBO numbers.
+  - "All parties": all_parties
+    maxlength: 108
+    help:
+      In this field you need to fill in all the parties listed on the Notice of Appeal.
+---
+id: Is there any about the case impounded
+question: |
+  Is there any about the case impounded?
+fields:
+  - "Is there any impounded info?": any_impounded_info
+    datatype: combobox
+    choices:
+      - Yes
+      - No
+      - Partially Impounded
+  - "Specify the impounded info. See SJC Rule 1:15. Sec. 2(a)": specify_impounded_info    
+    maxlength: 89
+    hide if:
+      variable: any_impounded_info
+      is: No
+---
+id: Transcriptions
+question: |
+  Transcriptions
+subquestion: |
+  Please give the requested information about transcriptions.
+fields:
+  - "Date transcripts where ordered": ordered_transcripts_date
+    datatype: date
+  - "Number of transcripts ordered": transcripts_number
+    maxlength: 42
+  - "Yes there are enclosed CD's of the transcripts": yes_cd_transcripts
+    datatype: yesno
+  - "No there are not enclosed CD's of the transcripts": no_cd_of_transcripts
+    datatype: yesno
+  - "Dates of the transcribed proceedings": transcriptions_dates
+    maxlength: 134
+    help: 
+      Please use MM/DD/YYYY format, seperated by commas.
+---
+id: If this is a Criminal Appeal
+question: |
+  If this is a Criminal Appeal.
+subquestion: |
+  Was there a Stay of Execution granted?
+fields:
+  - "Yes a Stay of Execution of Sentence has been granted": yes_stay_of_execution
+    datatype: yesno
+  - "No a Stay of Execution of Sentence has not been granted": no_stay_of_execution
+    datatype: yesno
+---
+id: Procedural Dates
+question: |
+  Procedural Dates
+subquestion: |
+  Please give the dates requested
+fields:
+  - "Date of notice of appeal": notice_of_appeal_date
+    datatype: date
+  - "Date the Notice of Assembly is issued": issuing_date
+    datatype: date
+---
+id: Clerks Information
+question: |
+  Clerks Information
+fields:
+  - "Name of Clerk completing form": clerk_name
+    maxlength: 80
+---
+#id: Post filing information
+#question: |
+#  Post filing information
+#subquestion: |
+#  This is for the receiving court to fill out.
+#fields:
+#  - "Date Entered in SJC or Appeals Court": appeals_entry_date
+#    datatype: date
+#  - "SJC or Appeals Court docket number": appeals_docket_number
+#    maxlength: 40
+---
+id: preview notice_of_appeal
+question: |
+  Preview your form before you sign it
+subquestion: |
+  Here is a preview of the form you will sign on the next page.   
+  
+  ${ al_court_bundle.as_pdf(key='preview') }
+
+  Click the image to open it in a new tab. Click the "Edit answers" button
+  to edit your answers.
+
+  ${ action_button_html(url_action('review_notice_of_appeal'), label='Edit answers', color='info') }
+  
+  Remember to come back to this window to continue and sign your form.
+continue button field: notice_of_appeal_preview_question    
+---
+code: |
+  signature_fields = []
+---
+code: |
+  # This is a placeholder for the addresses that will be searched
+  # for matching address to court. Edit if court venue is based on 
+  # a different address than the user's
+  addresses_to_search = [user.address for user in users]
+---
 id: notice of appeal review screen
 event: review_notice_of_appeal
 question: |
   Review your answers
 review:
-#  - Edit: form_entry_statement_flag
-#    button: |
-#      **Useless**:
-#      ${ form_entry_statement_flag }
-#  - Edit: form_statement_court_county
-#    button: |
-#      **Useless**:
-#      ${ form_statement_court_county }
-#  - Edit: form_statement_court
-#    button: |
-#      **useless**:
-#      ${ form_statement_court }
-#  - Edit: statement_district_court
-#    button: |
-#      **useless**:
-#      ${ statement_district_court }
-  - Edit: trial_docket_number
-    button: |
-      **Trial Court docket numbers**:
-      ${ trial_docket_number }
   - Edit: case_name
     button: |
-      **Case Name**:
+      **What is the name of the Case**:
       ${ case_name }
-  - Edit: case_nature
+  - Edit: plaintiffs_attorneys
     button: |
-      **Nature of the case**:
-      ${ case_nature }
-  - Edit: petitions_date
+      **Who are the Plaintiffs Attorneys**:
+      ${ plaintiffs_attorneys }
+  - Edit: defendants_attorneys
     button: |
-      **Date Petition, Complaint or Indictment Entered into Trial Court**:
-      ${ petitions_date }
-  - Edit: impounded_info
+      **Who are the Defendants Attorneys**:
+      ${ defendants_attorneys }
+  - Edit: nature_of_case
     button: |
-      **Is there impounded information?**:
-      ${ word(yesno(impounded_info)) }
-  - Edit: impounded_info_desc
+      **What is the Nature of the case (Select most appropriate description)**:
+      ${ nature_of_case }
+  - Edit: trial_court_entry_date
     button: |
-      **Description of impounded information**:
-      ${ impounded_info_desc }
-  - Edit: appeal_file_date
+      **What is the date the petition, complaint or indictment was entered in Trial Court**:
+      ${ trial_court_entry_date }
+  - Edit: any_impounded_info
     button: |
-      **Date when appeal was filed**:
-      ${ appeal_file_date }
-  - Edit: judgment_on_appeal
+      **Is there any impounded info?**:
+      ${ any_impounded_info }
+  - Edit: specify_impounded_info
     button: |
-      **Order or judgment on appeal**:
-      ${ judgment_on_appeal }
-  - Edit: transcripts_date
+      **Specify the impounded info. See SJC Rule 1:15. Sec. 2(a)**:
+      ${ specify_impounded_info }
+  - Edit: notice_of_appeal_date
     button: |
-      **Date transcripts ordered**:
-      ${ transcripts_date }
-  - Edit: transcripts_numbers
+      **Date of notice of appeal**:
+      ${ notice_of_appeal_date }
+  - Edit: all_parties
     button: |
-      **Number of transcript volumes**:
-      ${ transcripts_numbers }
-  - Edit: yes
+      **All parties**:
+      ${ all_parties }
+  - Edit: judgment_being_appealed
     button: |
-      **Yes**:
-      ${ word(yesno(yes)) }
-  - Edit: no_1
+      **The order or judgment being appealed**:
+      ${ judgment_being_appealed }
+  - Edit: ordered_transcripts_date
     button: |
-      **No**:
-      ${ word(yesno(no_1)) }
-  - Edit: transcription_date
+      **Date transcripts where ordered**:
+      ${ ordered_transcripts_date }
+  - Edit: transcripts_number
     button: |
-      **Date of transcribed proceedings**:
-      ${ transcription_date }
-  - Edit: no_2
+      **Number of transcripts ordered**:
+      ${ transcripts_number }
+  - Edit: yes_cd_transcripts
     button: |
-      **For Criminal Cases, has a Stay of Execution of Sentence been granted**:
-      ${ word(yesno(no_2)) }
-  - Edit: appeal_entry_date
+      **Yes there are enclosed CD\'s of the transcripts**:
+      ${ word(yesno(yes_cd_transcripts)) }
+  - Edit: no_cd_of_transcripts
     button: |
-      **Date entered in S.J.C or Appeals Court**:
-      ${ appeal_entry_date }
-  - Edit: docket2_number
+      **No there are not enclosed CD\'s of the transcripts**:
+      ${ word(yesno(no_cd_of_transcripts)) }
+  - Edit: transcriptions_dates
     button: |
-      **SJC or Appeals Court Docket Number**:
-      ${ docket2_number }
-#  - Edit: form_entry_statement_case
-#    button: |
-#      **Signature**:
-#      > ${ single_paragraph(form_entry_statement_case) }
+      **Dates of the transcribed proceedings**:
+      ${ transcriptions_dates }
+  - Edit: yes_stay_of_execution
+    button: |
+      **Yes a Stay of Execution of Sentence has been granted**:
+      ${ word(yesno(yes_stay_of_execution)) }
+  - Edit: no_stay_of_execution
+    button: |
+      **No a Stay of Execution of Sentence has not been granted**:
+      ${ word(yesno(no_stay_of_execution)) }
+  - Edit: issuing_date
+    button: |
+      **Date the Notice of Assembly is issued**:
+      ${ issuing_date }
+  - Edit: clerks.revisit
+    button: |
+      **Clerks**
+
+      % for item in clerks:
+        * ${ item }
+      % endfor
+  - Edit: appeals_entry_date
+    button: |
+      **Date Entered in SJC or Appeals Court**:
+      ${ appeals_entry_date }
+  - Edit: appeals_docket_number
+    button: |
+      **SJC or Appeals Court docket number**:
+      ${ appeals_docket_number }
   - Edit: trial_court
     button: |
       **trial_court**
@@ -555,35 +608,24 @@ review:
       % if defined("trial_court.department"):
       * department: ${ trial_court.department }
       % endif
-  - Edit: attorneys.revisit
+  - Edit: docket_numbers.revisit
     button: |
-      **Attorneys**
+      **Docket numbers**
 
-      % for item in attorneys:
+      % for item in docket_numbers:
         * ${ item }
       % endfor
-  - Edit: users.revisit
-    button: |
-      **Users**
-
-      % for item in users:
-        * ${ item }
-      % endfor
-  - Edit: signature_date
-    button: |
-      **signature_date**:
-      ${ signature_date }
 ---
-continue button field: attorneys.revisit
+continue button field: clerks.revisit
 question: |
-  Edit attorneys
+  Edit clerks
 subquestion: |
-  ${ attorneys.table }
+  ${ clerks.table }
 
-  ${ attorneys.add_action() }
+  ${ clerks.add_action() }
 ---
-table: attorneys.table
-rows: attorneys
+table: clerks.table
+rows: clerks
 columns:
   - Name: |
       row_item.name.full() if defined("row_item.name.first") else ""
@@ -592,21 +634,21 @@ edit:
 confirm: True
 
 ---
-continue button field: users.revisit
+continue button field: docket_numbers.revisit
 question: |
-  Edit users
+  Edit docket_numbers
 subquestion: |
-  ${ users.table }
+  ${ docket_numbers.table }
 
-  ${ users.add_action() }
+  ${ docket_numbers.add_action() }
 ---
-table: users.table
-rows: users
+table: docket_numbers.table
+rows: docket_numbers
 columns:
   - Name: |
-      row_item.name.full() if defined("row_item.name.first") else ""
+      row_item
 edit:
-  - name.first
+  True
 confirm: True
 
 ---
@@ -632,6 +674,15 @@ progress: 100
 objects:
   - notice_of_appeal_post_interview_instructions: ALDocument.using(title="Instructions", filename="notice_of_appeal_next_steps.docx", enabled=True, has_addendum=False, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE)
   - notice_of_appeal_attachment: ALDocument.using(title="Notice of the Assembly of the Record on Appeal Appellate Court Entry Statement", filename="notice_of_appeal.pdf", enabled=True, has_addendum=False, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE)
+---
+objects:
+  - al_user_bundle: ALDocumentBundle.using(elements=[notice_of_appeal_post_interview_instructions,notice_of_appeal_attachment], filename="notice_of_appeal.pdf_package.pdf", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[notice_of_appeal_attachment], filename="notice_of_appeal.pdf_package.pdf", title="All forms to download for your records", enabled=True)
+  - letter: ALDocument.using(title="Letter to Social Security", filename="ssa_letter", enabled=True, has_addendum=False)
+---
+objects:
+  - notice_of_appeal_post_interview_instructions: ALDocument.using(title="Instructions", filename="notice_of_appeal_next_steps.docx", enabled=True, has_addendum=False, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE)
+  - notice_of_appeal_attachment: ALDocument.using(title="Notice of the Assembly of the Record on Appeal Appellate Court Entry Statement", filename="notice_of_appeal.pdf", enabled=True, has_addendum=False, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE)
   - exhibit_attachment: ALExhibitDocument.using(
          title="Exhibits",
          filename="exhibits",
@@ -639,10 +690,6 @@ objects:
          include_table_of_contents=True,
          include_exhibit_cover_pages=True,
        )
----
-objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[notice_of_appeal_post_interview_instructions,notice_of_appeal_attachment,exhibit_attachment], filename="notice_of_appeal.pdf_package.pdf", title="All forms to download for your records", enabled=True)
-  - al_court_bundle: ALDocumentBundle.using(elements=[notice_of_appeal_attachment,exhibit_attachment], filename="notice_of_appeal.pdf_package.pdf", title="All forms to download for your records", enabled=True)
 ---
 attachments:
   - name: notice of appeal post interview instructions
@@ -657,31 +704,25 @@ attachments:
     pdf template file: notice_of_appeal.pdf
     fields:
       - "trial_court_department": ${ trial_court.department }
-      - "attorneys1_name": ${ attorneys[0] }
-      - "attorneys2_name": ${ attorneys[1] }
-      - "users1_name": ${ users[0] }
-      - "signature_date": ${ signature_date }
-#      - "form_entry_statement_flag": ${ form_entry_statement_flag }
-#      - "form_statement_court_county": ${ form_statement_court_county }
-#      - "form_statement_court__2": ${ form_statement_court }
-#      - "statement_district_court": ${ statement_district_court }
-      - "trial_docket_number": ${ trial_docket_number }
+      - "docket_numbers": ${ docket_numbers }
       - "case_name": ${ case_name }
-      - "case_nature": ${ case_nature }
-      - "petitions_date": ${ petitions_date }
-      - "impounded_info": ${ impounded_info }
-      - "impounded_info_desc": ${ impounded_info_desc }
-      - "appeal_file_date": ${ appeal_file_date }
-      - "judgment_on_appeal": ${ judgment_on_appeal }
-      - "transcripts_date": ${ transcripts_date }
-      - "transcripts_numbers": ${ "{:,.2f}".format(transcripts_numbers) }
-      - "yes__1": ${ yes }
-      - "yes__2": ${ yes }
-      - "no_1": ${ no_1 }
-      - "transcription_date": ${ transcription_date }
-      - "no_2": ${ no_2 }
-      - "appeal_entry_date": ${ appeal_entry_date }
-      - "docket2_number": ${ docket2_number }
-      - "form_entry_statement_case__7": ${ form_entry_statement_case }
-      # It's a signature: test which file version this is; leave empty unless it's the final version)
-      - "form_entry_statement_case__6": ${ form_entry_statement_case if i == 'final' else '' }
+      - "plaintiffs_attorneys": ${ plaintiffs_attorneys }
+      - "defendants_attorneys": ${ defendants_attorneys }
+      - "nature_of_case": ${ nature_of_case }
+      - "trial_court_entry_date": ${ trial_court_entry_date }
+      - "any_impounded_info": ${ any_impounded_info }
+      - "specify_impounded_info": ${ specify_impounded_info }
+      - "notice_of_appeal_date": ${ notice_of_appeal_date }
+      - "all_parties": ${ all_parties }
+      - "judgment_being_appealed": ${ judgment_being_appealed }
+      - "ordered_transcripts_date": ${ ordered_transcripts_date }
+      - "transcripts_number": ${ transcripts_number }
+      - "yes_cd_transcripts": ${ yes_cd_transcripts }
+      - "no_cd_of_transcripts": ${ no_cd_of_transcripts }
+      - "transcriptions_dates": ${ transcriptions_dates }
+      - "yes_stay_of_execution": ${ yes_stay_of_execution }
+      - "no_stay_of_execution": ${ no_stay_of_execution }
+      - "issuing_date": ${ issuing_date }
+      - "clerks_name": ${ clerks[0] }
+      - "appeals_entry_date": ${ appeals_entry_date }
+      - "appeals_docket_number": ${ appeals_docket_number }
