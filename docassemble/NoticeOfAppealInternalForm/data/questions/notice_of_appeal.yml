@@ -112,9 +112,9 @@ code: |
   ordered_transcripts_date
   set_progress(40)
   notice_of_appeal_date
-  clerk_name
+  clerks_name
   set_progress(60)
-  appeals_entry_date
+  #appeals_entry_date
   interview_order_notice_of_appeal = True
 ---
 ###################### Main order ######################
@@ -470,7 +470,7 @@ id: Clerks Information
 question: |
   Clerks Information
 fields:
-  - "Name of Clerk completing form": clerk_name
+  - "Name of Clerk completing form": clerks_name
     maxlength: 80
 ---
 #id: Post filing information
