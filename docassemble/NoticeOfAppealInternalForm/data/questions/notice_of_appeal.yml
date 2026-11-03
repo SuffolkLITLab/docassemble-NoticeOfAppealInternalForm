@@ -183,6 +183,7 @@ dropdown:
    -  Procedural Amount Dismissals, Single Justice Appeal, G. L. c. 212, § 3A and G. L. c. 218, § 19A 
 ---
 event: civil_case
+id: "you selected civil case full bench appeal from a judgment mass r a p 4 a please see the required attachments for a succesful notice of appeal filling"
 question: |
   You selected, Civil Case, Full Bench Appeal from a Judgment, Mass. R. A. P. 4(a), please see the required attachments for a succesful Notice of Appeal filling. 
 subquestion: |  
@@ -199,6 +200,7 @@ subquestion: |
 continue button field: civil_case
 ---
 event: criminal_case
+id: "you selected criminal case mass r a p 4 b please see the required attachments for a succesful notice of appeal filling"
 question: |
   You selected, **Criminal Case, Mass. R. A. P. 4(b)**, please see the required attachments for a succesful Notice of Appeal filling. 
 subquestion: |  
@@ -214,6 +216,7 @@ subquestion: |
 continue button field: criminal_case
 ---
 event: full_bench_summary_process
+id: "you selected summary process case full bench appeal from a judgment g l c 239 5 please see the required attachments for a succesful notice of appeal filling"
 question: |
   You selected, **Summary Process Case, Full Bench Appeal from a Judgment, G. L. c. 239, § 5**, please see the required attachments for a succesful Notice of Appeal filling. 
 subquestion: |
@@ -228,6 +231,7 @@ subquestion: |
 continue button field: full_bench_summary_process
 ---
 event: single_justice_summary_process
+id: "you selected summary process case single justice appeal regarding appeal bond g l c 239 5 please see the required attachments for a succesful notice of appeal filling"
 question: |
   You selected, **Summary Process Case, Single Justice Appeal Regarding Appeal Bond, G. L. c. 239, § 5**, please see the required attachments for a succesful Notice of Appeal filling. 
 subquestion: |
@@ -246,6 +250,7 @@ subquestion: |
 continue button field: single_justice_summary_process
 ---
 event: finding_concerning_indigency
+id: "you selected finding concerning indigency single justice appeal g l c 261 27d please see the required attachments for a succesful notice of appeal filling"
 question: |
   You selected, **Finding Concerning Indigency, Single Justice Appeal, G. L. c. 261, § 27D**, please see the required attachments for a succesful Notice of Appeal filling. 
 subquestion: |
@@ -262,6 +267,7 @@ subquestion: |
 continue button field: finding_concerning_indigency
 ---
 event: fee_frivolous_case
+id: "you selected attorneys fees for frivolous case single justice appeal g l c 231 6g please see the required attachments for a succesful notice of appeal filling"
 question: |
   You selected, **Attorney’s Fees for Frivolous Case, Single Justice Appeal, G. L. c. 231, § 6G**, please see the required attachments for a succesful Notice of Appeal filling. 
 subquestion: |
@@ -278,6 +284,7 @@ subquestion: |
 continue button field: fee_frivolous_case
 ---
 event: procedural_amount_dismissals
+id: "you selected procedural amount dismissals single justice appeal please see the required attachments for a succesful notice of appeal filling"
 question: |
   You selected, **Procedural Amount Dismissals, Single Justice Appeal**, please see the required attachments for a succesful Notice of Appeal filling. 
 subquestion: |
@@ -617,6 +624,7 @@ review:
       % endfor
 ---
 continue button field: clerks.revisit
+id: "edit clerks"
 question: |
   Edit clerks
 subquestion: |
@@ -635,6 +643,7 @@ confirm: True
 
 ---
 continue button field: docket_numbers.revisit
+id: "edit docket numbers"
 question: |
   Edit docket_numbers
 subquestion: |
